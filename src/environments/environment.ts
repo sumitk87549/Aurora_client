@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://becomes-instead-cottage-charlotte.trycloudflare.com/api'
+  apiUrl: 'https://titled-glucose-invite-unwrap.trycloudflare.com/api'
 };
