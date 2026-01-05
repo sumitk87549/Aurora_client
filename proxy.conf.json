@@ -1,10 +1,7 @@
 {
     "/api": {
         "target": "https://aurora-e5jl.onrender.com",
-        "secure": true,
-        "changeOrigin": true,
-        "pathRewrite": {
-            "^/api": ""
-        }
+        "secure": false,
+        "changeOrigin": true
     }
 }
