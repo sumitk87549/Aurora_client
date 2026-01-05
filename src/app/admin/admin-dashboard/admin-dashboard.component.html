@@ -1,0 +1,331 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="brand">
+      <h2>Aurora Admin</h2>
+    </div>
+
+    <nav class="admin-nav">
+      <a class="nav-item" [class.active]="activeTab === 'dashboard'" (click)="setActiveTab('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'orders'" (click)="setActiveTab('orders')">
+        <span class="icon">📦</span> My Orders
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'products'" (click)="setActiveTab('products')">
+        <span class="icon">🕯️</span> Products
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <span class="icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view-content animate-fade-in" *ngIf="activeTab === 'dashboard'">
+      <div class="page-header">
+        <h1>Dashboard Overview</h1>
+        <p>Welcome back, Admin.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card revenue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>Total Revenue</h3>
+            <p class="stat-value">{{ stats.totalRevenue | currency:'INR' }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card today">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <h3>Total sales</h3>
+            <p class="stat-value">{{ stats.todayRevenue | currency:'INR' }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card orders">
+          <div class="stat-icon">🛍️</div>
+          <div class="stat-info">
+            <h3>Total Orders</h3>
+            <p class="stat-value">{{ stats.totalOrders }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>Pending</h3>
+            <p class="stat-value">{{ stats.pendingOrders }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="recent-section">
+        <h2>Recent Orders</h2>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of orders | slice:0:5">
+                <td>#{{ order.orderNumber }}</td>
+                <td>{{ order.customerName }}</td>
+                <td>{{ order.orderDate | date:'mediumDate' }}</td>
+                <td>{{ order.totalAmount | currency:'INR' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="order.status.toLowerCase()">{{ order.status }}</span>
+                </td>
+                <td>
+                  <button class="btn-icon" (click)="viewOrderDetails(order.id)">👁️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS VIEW -->
+    <div class="view-content animate-fade-in" *ngIf="activeTab === 'orders'">
+      <div class="page-header">
+        <h1>Order Management</h1>
+      </div>
+
+      <div class="table-container full-height">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Method</th>
+              <th>Payment</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>
+                <span class="order-id">#{{ order.orderNumber }}</span>
+              </td>
+              <td>
+                <div class="customer-info">
+                  <span>{{ order.customerName }}</span>
+                  <small>{{ order.customerEmail }}</small>
+                </div>
+              </td>
+              <td>{{ order.orderDate | date:'short' }}</td>
+              <td>{{ order.paymentMethod }}</td>
+              <td>
+                <span class="badge" [ngClass]="order.paymentStatus.toLowerCase()">
+                  {{ order.paymentStatus }}
+                </span>
+              </td>
+              <td class="amount">{{ order.totalAmount | currency:'INR' }}</td>
+              <td>
+                <select class="status-select" [value]="order.status" (change)="updateOrderStatus(order.id, $event)">
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="SHIPPED">Shipped</option>
+                  <option value="DELIVERED">Delivered</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline" (click)="viewOrderDetails(order.id)">View</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS VIEW -->
+    <div class="view-content animate-fade-in" *ngIf="activeTab === 'products'">
+      <div class="page-header">
+        <h1>Product Management</h1>
+        <button class="btn btn-primary" (click)="createCandle_Form.scrollIntoView({behavior: 'smooth'})">
+          + Add New Product
+        </button>
+      </div>
+
+      <!-- Product List -->
+      <div class="products-grid">
+        <div class="product-card" *ngFor="let candle of candles">
+          <div class="product-image">
+            <div class="image-container">
+              <img [src]="getCurrentImageUrl(candle)" (error)="onImageError($event)" [alt]="candle.name">
+
+              <!-- Image Navigation Arrows -->
+              <button class="nav-arrow prev" *ngIf="candle.images && candle.images.length > 1"
+                (click)="prevImage(candle, $event)">❮</button>
+              <button class="nav-arrow next" *ngIf="candle.images && candle.images.length > 1"
+                (click)="nextImage(candle, $event)">❯</button>
+            </div>
+
+            <!-- Image Management -->
+            <div class="image-management" *ngIf="candle.images && candle.images.length > 0">
+              <span class="image-counter">{{ (currentImageIndex[candle.id] || 0) + 1 }} / {{ candle.images.length
+                }}</span>
+
+              <button class="btn-icon delete-image" *ngIf="candle.images && candle.images.length > 1"
+                (click)="deleteImage(candle.id, candle.images[currentImageIndex[candle.id] || 0].id)"
+                title="Delete current image">🗑️</button>
+            </div>
+
+            <span class="stock-badge" [class.low]="candle.stockQuantity < 5">
+              Stock: {{ candle.stockQuantity }}
+            </span>
+          </div>
+          <div class="product-details">
+            <h3>{{ candle.name }}</h3>
+            <p class="price">{{ candle.price | currency:'INR' }}</p>
+            <div class="actions">
+              <button class="btn-icon edit" (click)="editCandle(candle)">✏️</button>
+              <button class="btn-icon delete" (click)="deleteCandle(candle.id)">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create/Edit Form Container -->
+      <div class="form-container" #createCandle_Form [class.editing]="isEditing">
+        <h2 class="form-title">{{ isEditing ? 'Edit Product' : 'Add New Product' }}</h2>
+
+        <form (ngSubmit)="isEditing ? updateCandle() : createCandle()" class="admin-form">
+          <!-- Form content is same as before but styled -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Product Name</label>
+              <input type="text" [(ngModel)]="isEditing && editingCandle ? editingCandle.name : newCandle.name"
+                name="name" required>
+            </div>
+
+            <div class="form-group">
+              <label>Price (₹)</label>
+              <input type="number" [(ngModel)]="isEditing && editingCandle ? editingCandle.price : newCandle.price"
+                name="price" required>
+            </div>
+
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea rows="3"
+                [(ngModel)]="isEditing && editingCandle ? editingCandle.description : newCandle.description"
+                name="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Stock Quantity</label>
+              <input type="number"
+                [(ngModel)]="isEditing && editingCandle ? editingCandle.stockQuantity : newCandle.stockQuantity"
+                name="stock" required>
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select [(ngModel)]="isEditing && editingCandle ? editingCandle.category : newCandle.category"
+                name="category">
+                <option value="">-- Select Category --</option>
+                <option *ngFor="let cat of CATEGORIES" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Fragrance</label>
+              <select [(ngModel)]="isEditing && editingCandle ? editingCandle.fragrance : newCandle.fragrance"
+                name="fragrance">
+                <option value="">-- Select Fragrance --</option>
+                <option *ngFor="let frag of FRAGRANCES" [value]="frag">{{ frag }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="isEditing && editingCandle ? editingCandle.color : newCandle.color" name="color">
+                <option value="">-- Select Color --</option>
+                <option *ngFor="let col of COLORS" [value]="col">{{ col }}</option>
+              </select>
+            </div>
+
+            <div class="form-group check-group">
+              <label class="checkbox-label">
+                <input type="checkbox"
+                  [(ngModel)]="isEditing && editingCandle ? editingCandle.available : newCandle.available"
+                  name="available">
+                Available for Sale
+              </label>
+            </div>
+
+            <div class="form-group check-group">
+              <label class="checkbox-label">
+                <input type="checkbox"
+                  [(ngModel)]="isEditing && editingCandle ? editingCandle.creatorsChoice : newCandle.creatorsChoice"
+                  name="cc" (change)="onCreatorsChoiceChange()">
+                Creator's Choice
+              </label>
+            </div>
+
+            <div class="form-group check-group">
+              <label class="checkbox-label featured-checkbox">
+                <input type="checkbox"
+                  [(ngModel)]="isEditing && editingCandle ? editingCandle.featured : newCandle.featured"
+                  name="featured">
+                ✨ Featured (Shows on Homepage)
+              </label>
+            </div>
+
+            <div class="form-group" *ngIf="(isEditing && editingCandle?.creatorsChoice) || newCandle.creatorsChoice">
+              <label>Creator's Note</label>
+              <input type="text"
+                [(ngModel)]="isEditing && editingCandle ? editingCandle.creatorsText : newCandle.creatorsText"
+                name="ccText">
+            </div>
+
+            <div class="form-group full" *ngIf="!isEditing">
+              <label>Product Images</label>
+              <div class="file-upload">
+                <input type="file" multiple (change)="onImageSelect($event)" accept="image/*">
+                <span *ngIf="selectedImages.length > 0">{{ selectedImages.length }} files selected</span>
+              </div>
+            </div>
+
+            <div class="form-group full" *ngIf="isEditing">
+              <label>Additional Product Images</label>
+              <div class="file-upload">
+                <input type="file" multiple (change)="onEditingImageSelect($event)" accept="image/*">
+                <span *ngIf="editingImages.length > 0">{{ editingImages.length }} new files selected</span>
+              </div>
+              <small class="form-hint">Add more images to this product (existing images will remain)</small>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="isCreating || isUploading">
+              {{ isEditing ? 'Update Product' : (isCreating ? 'Creating...' : 'Create Product') }}
+            </button>
+            <button type="button" class="btn btn-secondary" *ngIf="isEditing" (click)="cancelEdit()">Cancel
+              Edit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>

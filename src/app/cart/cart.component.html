@@ -1,0 +1,134 @@
+<div class="main-content">
+  <div class="container animate-fade-in">
+    <div class="cart-header">
+      <h1>Shopping Trolley</h1>
+      <p *ngIf="cart && cart.cartItems.length > 0">{{ getTotalItems() }} items in your cart</p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="skeleton-list">
+        <div class="skeleton-header skeleton"></div>
+        <div class="skeleton-row skeleton" *ngFor="let i of [1,2,3]"></div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="errorMessage">
+      <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h3>Something went wrong</h3>
+        <p>{{ errorMessage }}</p>
+        <button class="btn btn-primary" (click)="loadCart()">Try Again</button>
+      </div>
+    </div>
+
+    <div class="cart-layout" *ngIf="!isLoading && !errorMessage">
+      <!-- Cart Items List -->
+      <div class="cart-main animate-slide-up">
+
+        <div class="empty-cart" *ngIf="cart && cart.cartItems.length === 0">
+          <div class="empty-icon">🛒</div>
+          <h2>Your cart is empty</h2>
+          <p>Looks like you haven't added any premium scents yet.</p>
+          <button class="btn btn-primary" routerLink="/candles">Start Shopping</button>
+        </div>
+
+        <div class="cart-items" *ngIf="cart && cart.cartItems.length > 0">
+          <div class="cart-item" *ngFor="let item of cart.cartItems">
+            <div class="item-image-container" (click)="navigateToCandleDetail(item.candle.id)">
+              <div class="item-image">
+                <img
+                  [src]="item.candle.images && item.candle.images.length > 0 ? getImageUrl(item.candle.images[0]) : '/assets/default-candle.jpg'"
+                  [alt]="item.candle.name">
+              </div>
+            </div>
+
+            <div class="item-details" (click)="navigateToCandleDetail(item.candle.id)">
+              <h3 class="item-title">{{ item.candle.name }}</h3>
+              <p class="subtitle">{{ item.candle.description | slice:0:50 }}...</p>
+            </div>
+
+            <div class="item-controls">
+              <div class="quantity-selector">
+                <button class="qty-btn" (click)="updateQuantity(item.id, item.quantity - 1)"
+                  [disabled]="item.quantity <= 1">−</button>
+                <span class="qty-num">{{ item.quantity }}</span>
+                <button class="qty-btn" (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+              </div>
+
+              <button class="btn-icon delete-btn" (click)="removeItem(item.id)" title="Remove Item">
+                <span style="color: #d32f2f; font-size: 1.2rem;">🗑️</span>
+              </button>
+
+              <div class="item-price">
+                ₹{{ item.priceAtTime * item.quantity | number }}
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-actions-row">
+            <button class="btn btn-secondary btn-sm" (click)="clearCart()">Clear Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="cart-sidebar animate-slide-up" style="animation-delay: 0.1s"
+        *ngIf="cart && cart.cartItems.length > 0 && orderSummary">
+        <div class="summary-card">
+          <h3>Order Summary</h3>
+
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>₹{{ orderSummary.subtotal | number }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span>GST ({{ orderSummary.gstRate }}%)</span>
+            <span>₹{{ orderSummary.gst | number }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Delivery</span>
+            <span *ngIf="orderSummary.isFreeDelivery" class="free-tag">Free</span>
+            <span *ngIf="!orderSummary.isFreeDelivery">₹{{ orderSummary.deliveryCharge | number }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>₹{{ orderSummary.totalAmount | number }}</span>
+          </div>
+
+          <div class="delivery-estimate">
+            <span class="estimate-icon">📦</span>
+            <span>Estimated Delivery: {{ orderSummary.estimatedDeliveryDays.min }}-{{
+              orderSummary.estimatedDeliveryDays.max }} days</span>
+          </div>
+
+          <div class="shipping-progress" *ngIf="!orderSummary.isFreeDelivery">
+            <p>Add <strong>₹{{ getAmountToFreeDelivery() }}</strong> more for Free Shipping</p>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="(orderSummary.subtotal / getFreeDeliveryThreshold()) * 100">
+              </div>
+            </div>
+          </div>
+
+          <div class="shipping-success" *ngIf="orderSummary.isFreeDelivery">
+            <span class="success-icon">✨</span> You've unlocked Free Shipping!
+          </div>
+
+          <button class="btn btn-primary btn-block checkout-btn" (click)="proceedToCheckout()">
+            Proceed to Checkout
+          </button>
+
+          <div class="secure-checkout">
+            <span>🔒 Secure Checkout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

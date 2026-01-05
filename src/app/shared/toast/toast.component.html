@@ -1,0 +1,28 @@
+<!-- Toast Notifications -->
+<div class="toast-container">
+    <div class="toast" *ngFor="let toast of toasts" [ngClass]="toast.type" (click)="dismissToast(toast.id)">
+        <span class="toast-icon">{{ getIcon(toast.type) }}</span>
+        <span class="toast-message">{{ toast.message }}</span>
+        <button class="toast-dismiss" (click)="dismissToast(toast.id)">×</button>
+    </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-overlay" *ngIf="confirmDialog" (click)="onCancel()">
+    <div class="confirm-dialog" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+            <h3>{{ confirmDialog.title }}</h3>
+        </div>
+        <div class="confirm-body">
+            <p>{{ confirmDialog.message }}</p>
+        </div>
+        <div class="confirm-actions">
+            <button class="btn btn-secondary" (click)="onCancel()">
+                {{ confirmDialog.cancelText }}
+            </button>
+            <button class="btn btn-primary" (click)="onConfirm()">
+                {{ confirmDialog.confirmText }}
+            </button>
+        </div>
+    </div>
+</div>

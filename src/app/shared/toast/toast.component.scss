@@ -1,0 +1,228 @@
+// Toast Container
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+// Individual Toast
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-out;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    border-left: 4px solid;
+
+    &:hover {
+        transform: translateX(-5px);
+    }
+
+    &.success {
+        border-left-color: #4caf50;
+
+        .toast-icon {
+            color: #4caf50;
+        }
+    }
+
+    &.error {
+        border-left-color: #f44336;
+
+        .toast-icon {
+            color: #f44336;
+        }
+    }
+
+    &.warning {
+        border-left-color: #ff9800;
+
+        .toast-icon {
+            color: #ff9800;
+        }
+    }
+
+    &.info {
+        border-left-color: #2196f3;
+
+        .toast-icon {
+            color: #2196f3;
+        }
+    }
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.toast-message {
+    flex: 1;
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.toast-dismiss {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+// Confirm Dialog Overlay
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-dialog {
+    background: linear-gradient(145deg, #2a2a2a, #1e1e1e);
+    border-radius: 16px;
+    padding: 0;
+    min-width: 350px;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: scaleIn 0.2s ease-out;
+    overflow: hidden;
+}
+
+.confirm-header {
+    padding: 20px 24px;
+    background: rgba(196, 149, 106, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+}
+
+.confirm-body {
+    padding: 20px 24px;
+
+    p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.2);
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+
+        &.btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        &.btn-primary {
+            background: linear-gradient(135deg, #C4956A, #a87a4f);
+            color: #fff;
+
+            &:hover {
+                background: linear-gradient(135deg, #d4a57a, #b88a5f);
+                transform: translateY(-1px);
+            }
+        }
+    }
+}
+
+// Animations
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+// Responsive
+@media (max-width: 480px) {
+    .toast-container {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+
+    .confirm-dialog {
+        min-width: auto;
+        margin: 0 20px;
+        width: calc(100% - 40px);
+    }
+}

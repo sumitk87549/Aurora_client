@@ -1,0 +1,139 @@
+<div class="main-content">
+    <div class="container animate-fade-in">
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="isLoading">
+            <div class="skeleton-header skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage">
+            <div class="error-icon">⚠️</div>
+            <h3>Something went wrong</h3>
+            <p>{{ errorMessage }}</p>
+            <button class="btn btn-primary" routerLink="/">Return Home</button>
+        </div>
+
+        <div class="order-details" *ngIf="!isLoading && order">
+            <div class="confirmation-header">
+                <div class="success-icon">✨</div>
+                <h1>Thank you for your order!</h1>
+                <p>Order #{{ order.orderNumber }} has been placed successfully.</p>
+                <p class="email-note">A confirmation email has been sent to {{ order.customerEmail }}</p>
+            </div>
+
+            <div class="order-grid">
+                <!-- Order Info Column -->
+                <div class="order-info-col">
+                    <div class="info-card">
+                        <h3>Order Status</h3>
+                        <div class="status-tracker">
+                            <div class="step completed">
+                                <div class="step-icon">✓</div>
+                                <span>Placed</span>
+                            </div>
+                            <div class="line" [class.active]="order.status !== 'PENDING'"></div>
+                            <div class="step" [class.completed]="order.status !== 'PENDING'">
+                                <div class="step-icon">{{ order.status !== 'PENDING' ? '✓' : '2' }}</div>
+                                <span>Confirmed</span>
+                            </div>
+                            <div class="line"
+                                [class.active]="order.status === 'SHIPPED' || order.status === 'DELIVERED'"></div>
+                            <div class="step"
+                                [class.completed]="order.status === 'SHIPPED' || order.status === 'DELIVERED'">
+                                <div class="step-icon">{{ (order.status === 'SHIPPED' || order.status === 'DELIVERED') ?
+                                    '✓' : '3' }}</div>
+                                <span>Shipped</span>
+                            </div>
+                            <div class="line" [class.active]="order.status === 'DELIVERED'"></div>
+                            <div class="step" [class.completed]="order.status === 'DELIVERED'">
+                                <div class="step-icon">{{ order.status === 'DELIVERED' ? '✓' : '4' }}</div>
+                                <span>Delivered</span>
+                            </div>
+                        </div>
+
+                        <div class="delivery-estimate" *ngIf="order.expectedDeliveryDate">
+                            <span class="label">Expected Delivery:</span>
+                            <span class="value">{{ order.expectedDeliveryDate | date:'fullDate' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Shipping Details</h3>
+                        <div class="detail-row">
+                            <span class="label">Name:</span>
+                            <span class="value">{{ order.customerName }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Phone:</span>
+                            <span class="value">{{ order.customerPhone }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Address:</span>
+                            <span class="value address">{{ order.shippingAddress }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Payment Information</h3>
+                        <div class="detail-row">
+                            <span class="label">Method:</span>
+                            <span class="value">{{ order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment
+                                (Razorpay)' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Status:</span>
+                            <span class="status-badge" [class.paid]="order.paymentStatus === 'PAID'"
+                                [class.unpaid]="order.paymentStatus !== 'PAID'">
+                                {{ order.paymentStatus }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items Column -->
+                <div class="order-items-col">
+                    <div class="receipt-card">
+                        <h3>Order Receipt</h3>
+                        <div class="receipt-items">
+                            <div class="receipt-item" *ngFor="let item of order.orderItems">
+                                <div class="item-main">
+                                    <span class="item-name">{{ item.candle.name }}</span>
+                                    <span class="item-meta">Qty: {{ item.quantity }} x ₹{{ item.priceAtTime }}</span>
+                                </div>
+                                <span class="item-total">₹{{ item.priceAtTime * item.quantity }}</span>
+                            </div>
+                        </div>
+
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-row">
+                            <span>Subtotal</span>
+                            <span>₹{{ order.subtotal }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Shipping</span>
+                            <span>₹{{ order.shippingCost }}</span>
+                        </div>
+                        <div class="receipt-row" *ngIf="order.discountAmount > 0">
+                            <span>Discount</span>
+                            <span>-₹{{ order.discountAmount }}</span>
+                        </div>
+
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-row total">
+                            <span>Total Paid</span>
+                            <span>₹{{ order.totalAmount }}</span>
+                        </div>
+
+                        <div class="receipt-actions">
+                            <button class="btn btn-secondary btn-sm" (click)="printOrder()">Print Receipt</button>
+                            <button class="btn btn-primary btn-sm" routerLink="/candles">Shop Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

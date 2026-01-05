@@ -1,0 +1,125 @@
+<div class="candles-container">
+
+  <header class="collection-header">
+    <h1>Our Premium Candles</h1>
+    <p class="header-description">Discover our handcrafted collection of scented candles, made with love and premium
+      ingredients to light up your life.</p>
+  </header>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <p>Loading candles...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="content-wrapper" *ngIf="!isLoading && !errorMessage">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search candles..." [(ngModel)]="searchQuery"
+          (input)="onSearch()">
+      </div>
+
+      <div class="filter-options">
+        <label class="filter-checkbox">
+          <input type="checkbox" [(ngModel)]="showAvailableOnly" (change)="applyFilters()">
+          Available Only
+        </label>
+
+        <select class="filter-select" [(ngModel)]="sortBy" (change)="onSortChange()">
+          <option value="name-asc">Name: A-Z</option>
+          <option value="name-desc">Name: Z-A</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" *ngIf="paginatedCandles.length > 0">
+      <div class="product-card" *ngFor="let candle of paginatedCandles" [class.featured-glow]="candle.featured">
+        <div class="card-image-wrapper" (click)="navigateToCandleDetail(candle)">
+          <div class="image-container">
+            <img [src]="getCurrentImageUrl(candle)" [alt]="candle.name" class="product-image"
+              onerror="this.src='/assets/default-candle.jpg'" />
+
+            <!-- Image Navigation Arrows -->
+            <button class="nav-arrow prev" *ngIf="candle.images && candle.images.length > 1"
+              (click)="prevImage(candle, $event)">❮</button>
+            <button class="nav-arrow next" *ngIf="candle.images && candle.images.length > 1"
+              (click)="nextImage(candle, $event)">❯</button>
+          </div>
+
+          <div class="card-badges">
+            <span class="badge out-of-stock" *ngIf="candle.stockQuantity === 0 || !candle.available">Out of Stock</span>
+            <span class="badge featured" *ngIf="candle.featured">✨</span>
+          </div>
+
+          <!-- Wishlist Heart Button -->
+          <button class="wishlist-heart" [class.in-wishlist]="isInWishlist(candle.id)"
+            [class.updating]="isUpdatingWishlist(candle.id)" (click)="toggleWishlist(candle, $event)"
+            [disabled]="!isLoggedIn() || isUpdatingWishlist(candle.id)"
+            title="{{ isInWishlist(candle.id) ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
+            {{ isInWishlist(candle.id) ? '❤️' : '🤍' }}
+          </button>
+        </div>
+
+        <div class="card-content" (click)="navigateToCandleDetail(candle)">
+          <h3 class="product-title">{{ candle.name }}</h3>
+          <p class="product-description">{{ candle.creatorsText ? (candle.creatorsText | slice:0:100) +
+            (candle.creatorsText.length > 100 ? '...' : '') : '' }}</p>
+
+          <div class="product-footer">
+            <div class="product-price">₹{{ candle.price }}</div>
+
+            <!-- Cart Controls -->
+            <div class="cart-action" (click)="$event.stopPropagation()">
+              <!-- Add to Cart Button -->
+              <button class="btn btn-primary btn-sm" *ngIf="!isInCart(candle.id)" (click)="addToCart(candle)"
+                [disabled]="!candle.available || candle.stockQuantity === 0 || !isLoggedIn() || isUpdatingCart(candle.id)">
+                {{ isUpdatingCart(candle.id) ? '...' : 'Add to Cart' }}
+              </button>
+
+              <!-- Quantity Controls -->
+              <div class="quantity-controls" *ngIf="isInCart(candle.id)">
+                <button class="qty-btn minus" (click)="updateQuantity(candle, -1)"
+                  [disabled]="isUpdatingCart(candle.id)">−</button>
+                <span class="qty-value">{{ getCartQuantity(candle.id) }}</span>
+                <button class="qty-btn plus" (click)="updateQuantity(candle, 1)"
+                  [disabled]="isUpdatingCart(candle.id) || candle.stockQuantity <= getCartQuantity(candle.id)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="paginatedCandles.length === 0">
+      <h2>No candles found</h2>
+      <p>Try adjusting your search or filters.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button class="btn-page" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+        Previous
+      </button>
+
+      <div class="page-numbers">
+        <button *ngFor="let page of getPages()" class="btn-page-number" [class.active]="currentPage === page"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <button class="btn-page" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
+        Next
+      </button>
+    </div>
+  </div>
+</div>

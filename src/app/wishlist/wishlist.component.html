@@ -1,0 +1,42 @@
+<div class="wishlist-container">
+  <h1>My Wishlist</h1>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <p>Loading wishlist...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="wishlist-content" *ngIf="!isLoading && !errorMessage">
+    <div class="wishlist-items" *ngIf="wishlist && wishlist.wishlistItems.length > 0">
+      <div class="wishlist-item" *ngFor="let item of wishlist.wishlistItems">
+        <div class="item-clickable-area" (click)="navigateToCandleDetail(item.candle.id)">
+          <div class="item-image" *ngIf="item && item.candle && item.candle.images && item.candle.images.length > 0">
+            <img [src]="getImageUrl(item.candle.images[0])" [alt]="item.candle.name"
+              onerror="this.src='/assets/default-candle.jpg'" />
+          </div>
+
+          <div class="item-info" *ngIf="item && item.candle">
+            <h3>{{ item.candle.name || 'Unknown Product' }}</h3>
+            <!-- <p class="item-description">{{ item.candle.description || 'No description available' }}</p> -->
+            <p class="item-price">₹{{ item.candle.price || 0 }}</p>
+            <p class="item-date">Added on {{ formatDate(item.addedAt) }}</p>
+          </div>
+        </div>
+
+        <div class="item-actions" *ngIf="item && item.candle">
+          <button class="btn btn-primary" (click)="addToCart(item.candle.id)">Add to Cart</button>
+          <button class="btn btn-secondary" (click)="removeFromWishlist(item.id)">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-wishlist" *ngIf="wishlist && wishlist.wishlistItems.length === 0">
+      <h2>Your wishlist is empty</h2>
+      <p>Add some candles you love to your wishlist!</p>
+      <button class="btn btn-primary" routerLink="/candles">Browse Candles</button>
+    </div>
+  </div>
+</div>

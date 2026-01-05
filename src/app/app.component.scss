@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-layout {
+  flex: 1;
+  width: 100%;
+  padding-top: 140px;
+  /* 110px Navbar + 30px gap */
+  padding-bottom: 40px;
+  /* Gap before footer */
+  display: block;
+}
+
+/* Adjust for smaller screens if needed */
+@media (max-width: 768px) {
+  .main-layout {
+    padding-top: 130px;
+    /* Slightly tighter on mobile */
+  }
+}

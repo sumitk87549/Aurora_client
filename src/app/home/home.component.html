@@ -1,0 +1,163 @@
+<main class="main-content">
+  <!-- Hero Section -->
+  <section class="hero animate-fade-in">
+    <div class="hero-bg">
+      <div class="glow-effect"></div>
+    </div>
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="hero-subtitle animate-slide-down">Handcrafted Luxury</span>
+        <h1 class="hero-title animate-slide-up">Illuminating Artistry<br>For Your Soul</h1>
+        <p class="hero-description animate-slide-up" style="animation-delay: 0.1s">
+          Discover our exclusive collection of artisanal candles, crafted with sustainable soy wax and premium essential
+          oils to transform your space.
+        </p>
+        <div class="hero-actions animate-slide-up" style="animation-delay: 0.2s">
+          <button class="btn btn-primary btn-lg" (click)="navigateToCandles()">Shop Collection</button>
+          <button class="btn btn-secondary btn-lg" [routerLink]="['/about']">Our Story</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Elements for Aesthetics -->
+    <div class="floating-element float-1">✨</div>
+    <div class="floating-element float-2">🕯️</div>
+    <div class="floating-element float-3">🌿</div>
+  </section>
+
+  <!-- Featured Candles Section -->
+  <section class="section featured-section" *ngIf="featuredCandles.length > 0">
+    <div class="featured-container">
+      <div class="section-header text-center mb-4">
+        <h2>✨ Featured Collection</h2>
+        <p>Our hand-picked favorites, crafted with extra love</p>
+      </div>
+
+      <div class="featured-grid">
+        <div class="featured-card" *ngFor="let candle of featuredCandles" [class.featured-glow]="true"
+          (click)="navigateToCandleDetail(candle)">
+
+          <div class="card-image-wrapper">
+            <img [src]="getCurrentImageUrl(candle)" [alt]="candle.name" class="product-image"
+              onerror="this.src='/assets/default-candle.jpg'" />
+
+            <!-- Image Navigation -->
+            <button class="nav-arrow prev" *ngIf="candle.images && candle.images.length > 1"
+              (click)="prevImage(candle, $event)">❮</button>
+            <button class="nav-arrow next" *ngIf="candle.images && candle.images.length > 1"
+              (click)="nextImage(candle, $event)">❯</button>
+
+            <!-- Wishlist Heart -->
+            <button class="wishlist-heart" [class.in-wishlist]="isInWishlist(candle.id)"
+              (click)="toggleWishlist(candle, $event)" [disabled]="!isLoggedIn() || isUpdatingWishlist(candle.id)">
+              {{ isInWishlist(candle.id) ? '❤️' : '🤍' }}
+            </button>
+
+            <div class="card-badges">
+              <span class="badge featured">Featured</span>
+              <span class="badge out-of-stock" *ngIf="candle.stockQuantity === 0">Out of Stock</span>
+            </div>
+          </div>
+
+          <div class="card-content">
+            <h3 class="product-title">{{ candle.name }}</h3>
+            <p class="product-description">{{ candle.description | slice:0:80 }}...</p>
+
+            <!-- <div class="product-footer" (click)="$event.stopPropagation()">
+              <div class="product-price">₹{{ candle.price }}</div>
+
+              <div class="cart-action">
+                <button class="btn btn-primary btn-sm" *ngIf="!isInCart(candle.id)" (click)="addToCart(candle)"
+                  [disabled]="!candle.available || candle.stockQuantity === 0 || !isLoggedIn() || isUpdatingCart(candle.id)">
+                  {{ isUpdatingCart(candle.id) ? '...' : 'Add to Cart' }}
+                </button>
+
+                <div class="quantity-controls" *ngIf="isInCart(candle.id)">
+                  <button class="qty-btn minus" (click)="updateQuantity(candle, -1)"
+                    [disabled]="isUpdatingCart(candle.id)">−</button>
+                  <span class="qty-value">{{ getCartQuantity(candle.id) }}</span>
+                  <button class="qty-btn plus" (click)="updateQuantity(candle, 1)"
+                    [disabled]="isUpdatingCart(candle.id)">+</button>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button class="btn btn-secondary" (click)="navigateToCandles()">View All Candles →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features">
+    <div class="features-container">
+      <div class="section-header text-center mb-4">
+        <h2>Why Choose Aurora</h2>
+        <p>Crafted with intention, designed for serenity</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="feature-card">
+          <div class="feature-icon">🌿</div>
+          <h3>100% Natural Soy Wax</h3>
+          <p>Eco-friendly, biodegradable, and burns cleaner than paraffin.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3>Premium Fragrances</h3>
+          <p>Curated blends of essential oils that soothe and uplift your mood.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🖐️</div>
+          <h3>Hand Poured</h3>
+          <p>Every candle is crafted by hand in small batches for quality.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2>Create Your Sanctuary</h2>
+          <p>Join our community and get exclusive access to new scents and limited editions.</p>
+
+          <div class="social-links-home">
+            <a href="https://instagram.com/AuroraFlames" target="_blank" class="social-icon" title="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+              Instagram
+            </a>
+            <a href="https://facebook.com/AuroraFlames" target="_blank" class="social-icon" title="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+              Facebook
+            </a>
+            <a href="https://whatsapp.com/AuroraFlames" target="_blank" class="social-icon" title="WhatsApp">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.199 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                <path
+                  d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.462-1.494A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.146 0-4.142-.679-5.772-1.834a.75.75 0 00-.576-.106l-2.927.979.98-2.924a.75.75 0 00-.107-.578A9.716 9.716 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" />
+              </svg>
+              Whatsapp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

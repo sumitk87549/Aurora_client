@@ -1,0 +1,70 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Register for Aurora Flames</h2>
+
+    <form (ngSubmit)="onSubmit()" class="register-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" [(ngModel)]="registerData.firstName" required
+            placeholder="Enter your first name" />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" [(ngModel)]="registerData.lastName" required
+            placeholder="Enter your last name" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" [(ngModel)]="registerData.email" required email
+          placeholder="Enter your email" />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" [(ngModel)]="registerData.phone" required
+          placeholder="Enter your phone number" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" [(ngModel)]="registerData.password" required minlength="6"
+          placeholder="Enter your password (min 6 characters)" />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="register-btn" [disabled]="isLoading">
+        {{ isLoading ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+
+    <div class="social-login-container">
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <div class="social-buttons">
+        <a href="http://localhost:8081/oauth2/authorization/google" class="social-btn google-btn">
+          <img src="https://www.google.com/favicon.ico" alt="Google"
+            width="20">
+          Sign up with Google
+        </a>
+        <a href="http://localhost:8081/oauth2/authorization/facebook" class="social-btn facebook-btn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook"
+            width="20">
+          Sign up with Facebook
+        </a>
+      </div>
+    </div>
+
+    <div class="register-footer">
+      <p>Already have an account? <a (click)="navigateToLogin()" class="login-link">Login here</a></p>
+    </div>
+  </div>
+</div>

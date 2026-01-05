@@ -1,0 +1,50 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Login to Aurora Flames</h2>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" [(ngModel)]="loginData.email" required email
+          placeholder="Enter your email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" [(ngModel)]="loginData.password" required minlength="6"
+          placeholder="Enter your password" />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="login-btn" [disabled]="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+
+    <div class="social-login-container">
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <div class="social-buttons">
+        <a href="http://localhost:8081/oauth2/authorization/google" class="social-btn google-btn">
+          <img src="https://www.google.com/favicon.ico" alt="Google"
+            width="20">
+          Login with Google
+        </a>
+        <a href="http://localhost:8081/oauth2/authorization/facebook" class="social-btn facebook-btn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook"
+            width="20">
+          Login with Facebook
+        </a>
+      </div>
+    </div>
+
+    <div class="login-footer">
+      <p>Don't have an account? <a (click)="navigateToRegister()" class="register-link">Register here</a></p>
+    </div>
+  </div>
+</div>

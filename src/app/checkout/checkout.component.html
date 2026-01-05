@@ -1,0 +1,202 @@
+<div class="main-content">
+  <div class="container animate-fade-in">
+    <div class="checkout-header">
+      <h1>Checkout</h1>
+      <p>Please review your order and details before completing purchase.</p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="skeleton-form skeleton"></div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage && !isProcessing">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" class="checkout-layout" *ngIf="!isLoading && cart">
+      <!-- Left Column: Forms -->
+      <div class="checkout-forms animate-slide-up">
+
+        <!-- Contact Information -->
+        <div class="form-section">
+          <h2>Contact Information</h2>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customerName">Full Name</label>
+              <input type="text" id="customerName" formControlName="customerName" placeholder="John Doe"
+                [class.error]="checkoutForm.get('customerName')?.invalid && checkoutForm.get('customerName')?.touched">
+              <span class="error-text"
+                *ngIf="checkoutForm.get('customerName')?.invalid && checkoutForm.get('customerName')?.touched">
+                Name is required (min 2 chars)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="customerPhone">Phone Number</label>
+              <input type="tel" id="customerPhone" formControlName="customerPhone" placeholder="9876543210"
+                [class.error]="checkoutForm.get('customerPhone')?.invalid && checkoutForm.get('customerPhone')?.touched">
+              <span class="error-text"
+                *ngIf="checkoutForm.get('customerPhone')?.invalid && checkoutForm.get('customerPhone')?.touched">
+                Valid 10-digit phone number needed for delivery
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customerEmail">Email Address</label>
+            <input type="email" id="customerEmail" formControlName="customerEmail" placeholder="john@example.com"
+              [class.error]="checkoutForm.get('customerEmail')?.invalid && checkoutForm.get('customerEmail')?.touched">
+            <span class="error-text"
+              *ngIf="checkoutForm.get('customerEmail')?.invalid && checkoutForm.get('customerEmail')?.touched">
+              Valid email required for order confirmation
+            </span>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="form-section">
+          <h2>Shipping Address</h2>
+          <div class="form-group">
+            <label for="shippingAddress">Street Address</label>
+            <input type="text" id="shippingAddress" formControlName="shippingAddress"
+              placeholder="123, Main Street, Apt 4B"
+              [class.error]="checkoutForm.get('shippingAddress')?.invalid && checkoutForm.get('shippingAddress')?.touched">
+            <span class="error-text"
+              *ngIf="checkoutForm.get('shippingAddress')?.invalid && checkoutForm.get('shippingAddress')?.touched">
+              Address is required
+            </span>
+          </div>
+
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="state">State</label>
+              <select id="state" formControlName="state"
+                [class.error]="checkoutForm.get('state')?.invalid && checkoutForm.get('state')?.touched">
+                <option value="">Select State</option>
+                <option *ngFor="let state of states" [value]="state.name">{{ state.name }}</option>
+              </select>
+              <span class="error-text" *ngIf="checkoutForm.get('state')?.invalid && checkoutForm.get('state')?.touched">
+                State is required
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <select id="city" formControlName="city"
+                [class.error]="checkoutForm.get('city')?.invalid && checkoutForm.get('city')?.touched"
+                [disabled]="!cities.length">
+                <option value="">Select City</option>
+                <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+              </select>
+              <span class="error-text" *ngIf="checkoutForm.get('city')?.invalid && checkoutForm.get('city')?.touched">
+                City is required
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="pincode">Pincode</label>
+              <input type="text" id="pincode" formControlName="pincode" placeholder="400001"
+                [class.error]="checkoutForm.get('pincode')?.invalid && checkoutForm.get('pincode')?.touched">
+              <span class="error-text"
+                *ngIf="checkoutForm.get('pincode')?.invalid && checkoutForm.get('pincode')?.touched">
+                Invalid Pincode
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="orderNotes">Order Notes (Optional)</label>
+            <textarea id="orderNotes" formControlName="orderNotes" rows="3"
+              placeholder="Special instructions for delivery..."></textarea>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-section">
+          <h2>Payment Method</h2>
+          <div class="payment-options">
+            <label class="payment-option" [class.selected]="checkoutForm.get('paymentMethod')?.value === 'COD'">
+              <input type="radio" value="COD" formControlName="paymentMethod">
+              <div class="option-content">
+                <span class="option-title">Cash on Delivery</span>
+                <span class="option-desc">Pay manually when your order arrives.</span>
+              </div>
+            </label>
+
+            <label class="payment-option" [class.selected]="checkoutForm.get('paymentMethod')?.value === 'RAZORPAY'"
+              [class.disabled]="!razorpayConfigured">
+              <input type="radio" value="RAZORPAY" formControlName="paymentMethod"
+                [attr.disabled]="!razorpayConfigured ? '' : null">
+              <div class="option-content">
+                <span class="option-title">Online Payment (Razorpay)</span>
+                <span class="option-desc" *ngIf="razorpayConfigured">Credit Card, Debit Card, UPI, NetBanking.</span>
+                <span class="option-desc error-text" *ngIf="!razorpayConfigured">Currently Unavailable</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Summary -->
+      <div class="checkout-sidebar animate-slide-up" style="animation-delay: 0.1s">
+        <div class="summary-card">
+          <h3>Order Summary</h3>
+
+          <div class="summary-items">
+            <div class="summary-item" *ngFor="let item of cart.cartItems">
+              <div class="item-info">
+                <span class="item-name">{{ item.candle.name }}</span>
+                <span class="item-qty">x {{ item.quantity }}</span>
+              </div>
+              <span class="item-price">₹{{ item.priceAtTime * item.quantity }}</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>₹{{ getTotalPrice() }}</span>
+          </div>
+
+          <div class="summary-row" *ngIf="orderSummary">
+            <span>GST ({{ orderSummary.gstRate }}%)</span>
+            <span>₹{{ getGST() }}</span>
+          </div>
+
+          <div class="summary-row" *ngIf="orderSummary">
+            <span>Delivery</span>
+            <span *ngIf="orderSummary.isFreeDelivery" class="free-tag">Free</span>
+            <span *ngIf="!orderSummary.isFreeDelivery">₹{{ getShippingCost() }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>₹{{ getGrandTotal() }}</span>
+          </div>
+
+          <div class="delivery-estimate" *ngIf="orderSummary">
+            <span class="estimate-icon">📦</span>
+            <span>Est. Delivery: {{ orderSummary.estimatedDeliveryDate.earliest | date:'mediumDate' }} - {{
+              orderSummary.estimatedDeliveryDate.latest | date:'mediumDate' }}</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block place-order-btn"
+            [disabled]="isProcessing || checkoutForm.invalid">
+            <span *ngIf="!isProcessing">
+              Place Order
+            </span>
+            <span *ngIf="isProcessing">Processing...</span>
+          </button>
+
+          <div class="security-badges">
+            <span>🔒 SSL Secured</span>
+            <span>🛡️ Buyer Protection</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

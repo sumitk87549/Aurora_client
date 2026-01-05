@@ -1,0 +1,6 @@
+/
+/about
+/contact
+/candles
+/login
+/register

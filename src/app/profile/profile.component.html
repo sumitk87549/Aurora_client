@@ -1,0 +1,105 @@
+<div class="main-content">
+    <div class="container animate-fade-in">
+        <div class="profile-header text-center">
+            <h1>My Profile</h1>
+            <p>Manage your account details and preferences.</p>
+        </div>
+        <br>
+
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="isLoading">
+            <div class="skeleton-form skeleton" style="height: 300px; max-width: 800px; margin: 0 auto;"></div>
+        </div>
+
+        <div class="profile-content" *ngIf="!isLoading">
+            <!-- Success/Error Toasts (hidden now using toast service) -->
+            <div class="toast toast-success" *ngIf="successMessage">
+                {{ successMessage }}
+            </div>
+            <div class="toast toast-error" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+
+                <!-- Emoji Selection -->
+                <div class="form-section emoji-section">
+                    <h2>Profile Avatar</h2>
+                    <div class="current-emoji">{{ profileForm.get('profileEmoji')?.value }}</div>
+                    <div class="emoji-grid">
+                        <button type="button" *ngFor="let emoji of emojis" class="emoji-btn"
+                            [class.active]="profileForm.get('profileEmoji')?.value === emoji"
+                            (click)="selectEmoji(emoji)">
+                            {{ emoji }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="form-section">
+                    <h2>Personal Information</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" formControlName="firstName">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" formControlName="lastName">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" formControlName="email">
+                            <small>Email cannot be changed</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" formControlName="phone">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Info -->
+                <div class="form-section">
+                    <h2>Shipping Address</h2>
+                    <div class="form-group">
+                        <label>Street Address</label>
+                        <textarea formControlName="defaultAddress" rows="2"
+                            placeholder="123, Main Street..."></textarea>
+                    </div>
+
+                    <div class="form-row three-col">
+                        <div class="form-group">
+                            <label>State</label>
+                            <select formControlName="state">
+                                <option value="">Select State</option>
+                                <option *ngFor="let state of states" [value]="state.name">{{ state.name }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <select formControlName="city">
+                                <option value="">Select City</option>
+                                <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="text" formControlName="pincode">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions text-center">
+                    <button type="submit" class="btn btn-primary btn-lg" [disabled]="isSaving || profileForm.pristine">
+                        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

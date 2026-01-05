@@ -1,0 +1,110 @@
+.about-container {
+  padding-top: 80px;
+  /* Account for fixed navbar */
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-theme);
+}
+
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/assets/default-candle.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 6rem 1rem;
+  margin-bottom: 3rem;
+  position: sticky;
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-family: 'Playfair Display', serif;
+    color: white;
+  }
+
+  .subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.content-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.story-card {
+  background: var(--bg-card);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 3rem;
+  text-align: center;
+  transition: all var(--transition-theme);
+
+  h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+
+  .value-item {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: transform 0.3s ease, background-color var(--transition-theme);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  }
+}
+
+/* Dark mode specific enhancements */
+[data-theme="dark"] {
+
+  .story-card,
+  .value-item {
+    border: 1px solid var(--border-color);
+
+    &:hover {
+      box-shadow: var(--shadow-glow);
+      border-color: var(--accent-gold);
+    }
+  }
+
+  .hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/assets/default-candle.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+}

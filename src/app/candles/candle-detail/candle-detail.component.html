@@ -1,0 +1,142 @@
+<div class="page-container">
+    <div class="loading-spinner" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading candle details...</p>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage && !isLoading">
+        {{ errorMessage }}
+        <button class="btn btn-secondary" routerLink="/candles">Back to Collection</button>
+    </div>
+
+    <div class="product-detail-container" *ngIf="candle && !isLoading">
+        <button class="back-button" (click)="goBack()">
+            <span class="back-arrow">←</span> Back to Collection
+        </button>
+
+        <div class="product-layout">
+            <!-- Image Section -->
+            <div class="product-gallery">
+                <div class="main-image-container" [class.zooming]="isZooming">
+                    <button class="nav-btn prev" *ngIf="candle.images && candle.images.length > 1"
+                        (click)="prevImage()">❮</button>
+
+                    <div class="image-zoom-wrapper">
+                        <img [src]="getCurrentImageUrl()" [alt]="candle.name" class="main-image"
+                            (mouseenter)="onImageMouseEnter()" (mousemove)="onImageMouseMove($event)"
+                            (mouseleave)="onImageMouseLeave()" (touchstart)="onImageTouchStart($event)"
+                            (touchmove)="onImageTouchMove($event)" (touchend)="onImageTouchEnd()"
+                            (error)="handleImageError($event)">
+                    </div>
+
+                    <!-- Zoomed image overlay for desktop -->
+                    <div class="zoom-overlay" *ngIf="isZooming"
+                        [style.background-image]="'url(' + getCurrentImageUrl() + ')'"
+                        [style.background-position]="zoomX + '% ' + zoomY + '%'">
+                    </div>
+
+                    <button class="nav-btn next" *ngIf="candle.images && candle.images.length > 1"
+                        (click)="nextImage()">❯</button>
+
+                    <div class="badges">
+                        <span class="badge out-of-stock" *ngIf="!candle.available || candle.stockQuantity === 0">Out of
+                            Stock</span>
+                        <!-- <span class="badge creators-choice" *ngIf="candle.creatorsChoice">Creator's Choice</span> -->
+                    </div>
+
+                    <!-- Zoom hint -->
+                    <div class="zoom-hint" *ngIf="!isZooming">
+                        <span class="zoom-icon">🔍</span> Hover to zoom
+                    </div>
+                </div>
+
+                <!-- Thumbnails -->
+                <div class="thumbnails" *ngIf="candle.images && candle.images.length > 1">
+                    <div class="thumbnail" *ngFor="let img of candle.images; let i = index"
+                        [class.active]="i === currentImageIndex" (click)="currentImageIndex = i">
+                        <img [src]="getImageUrl(img)" [alt]="candle.name" (error)="handleImageError($event)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="product-info">
+                <h1 class="product-title">{{ candle.name }}</h1>
+
+                <div class="product-price-row">
+                    <span class="price">₹{{ candle.price }}</span>
+                    <span class="stock-status" [class.in-stock]="candle.available && candle.stockQuantity > 0">
+                        {{ candle.available && candle.stockQuantity > 0 ? 'In Stock' : 'Currently Unavailable' }}
+                    </span>
+                </div>
+
+                <!-- Variant Selector (Amazon-like) -->
+                <div class="variant-selector"
+                    *ngIf="categoryCandles.length > 1 && (availableFragrances.length > 1 || availableColors.length > 1)">
+                    <h4 class="variant-title">Choose Your Variant</h4>
+
+                    <div class="variant-options">
+                        <div class="variant-group" *ngIf="availableFragrances.length > 1">
+                            <label class="variant-label">Fragrance</label>
+                            <select class="variant-select" [(ngModel)]="selectedFragrance" (change)="onVariantChange()">
+                                <option *ngFor="let frag of availableFragrances" [value]="frag">{{ frag }}</option>
+                            </select>
+                        </div>
+
+                        <div class="variant-group" *ngIf="availableColors.length > 1">
+                            <label class="variant-label">Color</label>
+                            <select class="variant-select" [(ngModel)]="selectedColor" (change)="onVariantChange()">
+                                <option *ngFor="let col of availableColors" [value]="col">{{ col }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p class="variant-hint">
+                        <span class="hint-icon">💡</span>
+                        Selecting a different option will show you a related candle in this collection.
+                    </p>
+                </div>
+
+                <div class="creators-note" *ngIf="candle.creatorsChoice && candle.creatorsText">
+                    <div class="note-icon">✨</div>
+                    <p class="note-text">"{{ candle.creatorsText }}" <br> <span class="author">- From the Creator</span>
+                    </p>
+                </div>
+
+                <div class="description">
+                    <h3>Description</h3>
+                    <p>{{ candle.description }}</p>
+                </div>
+
+                <div class="actions">
+                    <!-- Cart Controls -->
+                    <div class="cart-wrapper">
+                        <ng-container *ngIf="!cartItem; else quantityControls">
+                            <button class="btn btn-primary btn-lg btn-block" (click)="addToCart()"
+                                [disabled]="!candle.available || candle.stockQuantity === 0 || isUpdatingCart">
+                                {{ isUpdatingCart ? 'Adding...' : 'Add to Cart' }}
+                            </button>
+                        </ng-container>
+
+                        <ng-template #quantityControls>
+                            <div class="quantity-controls big-controls">
+                                <button class="qty-btn" (click)="updateQuantity(-1)"
+                                    [disabled]="isUpdatingCart">−</button>
+                                <span class="qty-value">{{ cartItem?.quantity }}</span>
+                                <button class="qty-btn" (click)="updateQuantity(1)"
+                                    [disabled]="isUpdatingCart || (candle.stockQuantity <= (cartItem?.quantity || 0))">+</button>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Wishlist Heart Icon -->
+                    <button class="wishlist-btn-circle" [class.active]="isInWishlist" (click)="toggleWishlist()"
+                        [disabled]="isUpdatingWishlist"
+                        title="{{ isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
+                        {{ isInWishlist ? '❤️' : '🤍' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
