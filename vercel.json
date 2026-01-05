@@ -15,6 +15,6 @@
     }
   ],
   "env": {
-    "API_URL": "https://aurora-e5jl.onrender.com"
+    "PUBLIC_API_URL": "https://aurora-e5jl.onrender.com"
   }
 }
