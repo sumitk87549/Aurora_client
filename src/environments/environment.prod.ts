@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://titled-glucose-invite-unwrap.trycloudflare.com/api'
+  apiUrl: 'https://demanding-warranty-must-true.trycloudflare.com/api'
 };
